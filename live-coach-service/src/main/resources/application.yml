@@ -12,7 +12,7 @@ spring:
       write-dates-as-timestamps: false
 
 server:
-  port: ${SERVER_PORT:8083}
+  port: ${PORT:8083}
 
 gemini:
   model: ${GEMINI_MODEL:models/gemini-2.0-flash-exp}

@@ -14,7 +14,7 @@ spring:
       write-dates-as-timestamps: false
 
 server:
-  port: ${SERVER_PORT:8082}
+  port: ${PORT:8082}
 
 logging:
   level:
