@@ -3,13 +3,18 @@ package com.thropic.talki.livecoach.application.services;
 import com.thropic.talki.livecoach.domain.event.SessionLiveFinalizedEvent;
 import com.thropic.talki.livecoach.domain.model.SessionModeStrategy;
 import com.thropic.talki.livecoach.domain.model.SessionModeStrategyFactory;
+import com.thropic.talki.livecoach.infrastructure.gemini.EphemeralToken;
+import com.thropic.talki.livecoach.infrastructure.gemini.GeminiTokenService;
 import com.thropic.talki.livecoach.infrastructure.messaging.producer.SessionFinalizedPublisher;
+import com.thropic.talki.livecoach.interfaces.rest.dto.LiveTokenResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.time.Instant;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -22,6 +27,9 @@ class LiveCoachOrchestratorTest {
 
     @Mock
     private SessionFinalizedPublisher publisher;
+
+    @Mock
+    private GeminiTokenService geminiTokenService;
 
     @Mock
     private SessionModeStrategy strategy;
@@ -37,6 +45,25 @@ class LiveCoachOrchestratorTest {
         String result = orchestrator.prepareSystemPrompt("interview", "scn-001");
 
         assertThat(result).isEqualTo("Eres un reclutador...");
+    }
+
+    @Test
+    void createLiveSession_shouldMintTokenForModePrompt() {
+        Instant expiry = Instant.now().plusSeconds(1800);
+        when(strategyFactory.create("interview")).thenReturn(strategy);
+        when(strategy.buildSystemPrompt("scn-001")).thenReturn("Eres un reclutador...");
+        when(strategy.maxDurationMinutes()).thenReturn(15);
+        when(geminiTokenService.mint("Eres un reclutador..."))
+                .thenReturn(new EphemeralToken("auth_tokens/abc", "gemini-2.0-flash-live-001", expiry));
+
+        LiveTokenResponse response = orchestrator.createLiveSession("interview", "scn-001");
+
+        assertThat(response.token()).isEqualTo("auth_tokens/abc");
+        assertThat(response.model()).isEqualTo("gemini-2.0-flash-live-001");
+        assertThat(response.mode()).isEqualTo("interview");
+        assertThat(response.maxDurationMinutes()).isEqualTo(15);
+        assertThat(response.expiresAt()).isEqualTo(expiry.toString());
+        verify(geminiTokenService).mint("Eres un reclutador...");
     }
 
     @Test

@@ -15,7 +15,15 @@ server:
   port: ${PORT:8083}
 
 gemini:
-  model: ${GEMINI_MODEL:models/gemini-2.0-flash-exp}
+  # API key de Google AI Studio. NUNCA se commitea: se inyecta por entorno.
+  # Sin ella, POST /v1/coach/live-token responde 503 (el resto del servicio funciona).
+  api-key: ${GEMINI_API_KEY:}
+  # Modelo de la Live API (id sin prefijo "models/"). Debe soportar bidiGenerateContent.
+  model: ${GEMINI_MODEL:gemini-2.5-flash-native-audio-latest}
+  base-url: ${GEMINI_BASE_URL:https://generativelanguage.googleapis.com}
+  # Vigencia del token efímero y ventana para abrir la primera sesión (segundos).
+  token-ttl-seconds: ${GEMINI_TOKEN_TTL_SECONDS:1800}
+  session-ttl-seconds: ${GEMINI_SESSION_TTL_SECONDS:120}
   max-session-minutes: ${GEMINI_MAX_SESSION_MINUTES:15}
 
 logging:

@@ -31,7 +31,10 @@ services:
       RABBITMQ_PORT: 5672
       RABBITMQ_USERNAME: guest
       RABBITMQ_PASSWORD: guest
-      GEMINI_MODEL: gemini-2.0-flash-live-001
+      GEMINI_MODEL: gemini-2.5-flash-native-audio-latest
+      # Se toma del entorno del host (o de un .env junto al compose). Sin ella,
+      # /v1/coach/live-token responde 503 pero el resto del servicio funciona.
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
     depends_on:
       rabbitmq:
         condition: service_healthy

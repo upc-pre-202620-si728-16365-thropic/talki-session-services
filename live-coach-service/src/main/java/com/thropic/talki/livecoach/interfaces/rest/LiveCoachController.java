@@ -2,6 +2,10 @@ package com.thropic.talki.livecoach.interfaces.rest;
 
 import com.thropic.talki.livecoach.application.services.LiveCoachOrchestrator;
 import com.thropic.talki.livecoach.domain.event.SessionLiveFinalizedEvent;
+import com.thropic.talki.livecoach.infrastructure.gemini.GeminiNotConfiguredException;
+import com.thropic.talki.livecoach.infrastructure.gemini.GeminiTokenException;
+import com.thropic.talki.livecoach.interfaces.rest.dto.LiveTokenResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +27,29 @@ public class LiveCoachController {
                 "modes", java.util.List.of("quick_practice", "interview", "thesis_defense", "scenario"),
                 "description", "Modos disponibles para sesiones con Gemini Live"
         ));
+    }
+
+    /**
+     * Emite un token efímero de Gemini Live para el modo indicado. El navegador
+     * lo usa como credencial de un solo uso para abrir el WebSocket con Gemini.
+     */
+    @PostMapping("/live-token")
+    public ResponseEntity<?> liveToken(
+            @RequestParam String mode,
+            @RequestParam(required = false) String scenarioId) {
+        try {
+            LiveTokenResponse response = orchestrator.createLiveSession(mode, scenarioId);
+            return ResponseEntity.ok(response);
+        } catch (GeminiNotConfiguredException e) {
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                    .body(Map.of("error", e.getMessage()));
+        } catch (GeminiTokenException e) {
+            return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+                    .body(Map.of("error", e.getMessage()));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", e.getMessage()));
+        }
     }
 
     @PostMapping("/{sessionId}/finalize")
