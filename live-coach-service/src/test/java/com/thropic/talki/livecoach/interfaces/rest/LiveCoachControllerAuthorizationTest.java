@@ -2,6 +2,7 @@ package com.thropic.talki.livecoach.interfaces.rest;
 
 import com.thropic.talki.livecoach.application.services.LiveCoachOrchestrator;
 import com.thropic.talki.livecoach.domain.event.SessionLiveFinalizedEvent;
+import com.thropic.talki.livecoach.infrastructure.messaging.producer.SecurityAuditPublisher;
 import com.thropic.talki.livecoach.infrastructure.security.JwtAuthenticationFilter;
 import com.thropic.talki.livecoach.infrastructure.security.SecurityAuditService;
 import com.thropic.talki.livecoach.interfaces.rest.dto.LiveTokenResponse;
@@ -10,6 +11,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -36,7 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * sin ligarse a usuario.
  */
 @WebMvcTest(LiveCoachController.class)
-@Import({JwtAuthenticationFilter.class, SecurityAuditService.class})
+@Import({JwtAuthenticationFilter.class, SecurityAuditService.class, SecurityAuditPublisher.class})
 @TestPropertySource(properties = "jwt.secret=test-secret-para-sb1-02b-de-32-bytes-minimo!!")
 class LiveCoachControllerAuthorizationTest {
 
@@ -50,6 +52,9 @@ class LiveCoachControllerAuthorizationTest {
 
     @MockBean
     private LiveCoachOrchestrator orchestrator;
+
+    @MockBean
+    private RabbitTemplate rabbitTemplate; // la auditoría publica security.access.denied; el slice no levanta broker
 
     @Test
     void finalize_usesUserIdFromToken_ignoresClientValue() throws Exception {
