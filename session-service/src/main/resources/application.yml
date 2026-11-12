@@ -19,6 +19,11 @@ spring:
     password: ${RABBITMQ_PASSWORD:guest}
     virtual-host: ${RABBITMQ_VHOST:/}
 
+jwt:
+  # Compartido con identity-service (JwtTokenProvider). Sin fallback (SB1-07-D):
+  # si falta JWT_SECRET el servicio falla al arrancar.
+  secret: ${JWT_SECRET}
+
 server:
   port: ${PORT:8082}
 
