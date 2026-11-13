@@ -14,6 +14,11 @@ spring:
 server:
   port: ${PORT:8083}
 
+jwt:
+  # Compartido con identity-service (JwtTokenProvider). Sin fallback (SB1-07-D):
+  # si falta JWT_SECRET el servicio falla al arrancar.
+  secret: ${JWT_SECRET}
+
 gemini:
   # API key de Google AI Studio. NUNCA se commitea: se inyecta por entorno.
   # Sin ella, POST /v1/coach/live-token responde 503 (el resto del servicio funciona).
@@ -25,10 +30,6 @@ gemini:
   token-ttl-seconds: ${GEMINI_TOKEN_TTL_SECONDS:1800}
   session-ttl-seconds: ${GEMINI_SESSION_TTL_SECONDS:120}
   max-session-minutes: ${GEMINI_MAX_SESSION_MINUTES:15}
-
-logging:
-  level:
-    com.thropic.talki: DEBUG
 
 springdoc:
   api-docs:

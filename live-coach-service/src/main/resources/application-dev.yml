@@ -1,0 +1,4 @@
+# Solo desarrollo (SB1-07-D): DEBUG es ruidoso y puede filtrar datos en logs.
+logging:
+  level:
+    com.thropic.talki: DEBUG
