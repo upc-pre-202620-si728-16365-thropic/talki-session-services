@@ -8,7 +8,6 @@ spring:
     hibernate:
       ddl-auto: create-drop
     database-platform: org.hibernate.dialect.H2Dialect
-    show-sql: true
   jackson:
     serialization:
       write-dates-as-timestamps: false
@@ -26,10 +25,6 @@ jwt:
 
 server:
   port: ${PORT:8082}
-
-logging:
-  level:
-    com.thropic.talki: DEBUG
 
 springdoc:
   api-docs:

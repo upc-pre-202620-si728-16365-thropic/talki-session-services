@@ -31,10 +31,6 @@ gemini:
   session-ttl-seconds: ${GEMINI_SESSION_TTL_SECONDS:120}
   max-session-minutes: ${GEMINI_MAX_SESSION_MINUTES:15}
 
-logging:
-  level:
-    com.thropic.talki: DEBUG
-
 springdoc:
   api-docs:
     path: /v3/api-docs
