@@ -1,5 +1,6 @@
 package com.thropic.talki.session.domain.model.entities;
 
+import com.thropic.talki.session.domain.exceptions.InvalidSessionTransitionException;
 import com.thropic.talki.session.domain.model.valueobjects.SessionStatus;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
@@ -44,13 +45,13 @@ public class Session {
 
     public void start() {
         if (this.status != SessionStatus.DRAFT)
-            throw new IllegalStateException("Session must be DRAFT to start.");
+            throw new InvalidSessionTransitionException("start", this.status, "Session must be DRAFT to start.");
         this.status = SessionStatus.RECORDING;
     }
 
     public void finalizeSession() {
         if (this.status != SessionStatus.RECORDING)
-            throw new IllegalStateException("Session must be RECORDING to finalize.");
+            throw new InvalidSessionTransitionException("finalize", this.status, "Session must be RECORDING to finalize.");
         this.status = SessionStatus.PROCESSING;
         this.finalizedAt = LocalDateTime.now();
     }

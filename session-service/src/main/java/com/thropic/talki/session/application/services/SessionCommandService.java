@@ -12,6 +12,9 @@ public interface SessionCommandService {
 
     Session create(Long userId, String title, String sessionType);
 
+    /** SB1-03: inicia la grabación de una sesión en DRAFT (pasa a RECORDING). */
+    Session start(Long sessionId);
+
     Session finalize(Long sessionId);
 
     Feedback addFeedback(Long sessionId, String feedbackType, String content);

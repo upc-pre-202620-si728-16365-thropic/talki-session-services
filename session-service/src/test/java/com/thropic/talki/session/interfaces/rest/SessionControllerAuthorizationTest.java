@@ -8,7 +8,6 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -192,13 +191,10 @@ class SessionControllerAuthorizationTest {
     }
 
     /**
-     * PENDIENTE (SB1-03, Alejandro): el segundo finalize lanza IllegalState →
-     * hoy responde 500. Cuando la máquina de estados devuelva 409 (o el código
-     * que defina SB1-03), se activa: la sesión debe seguir accesible por A y
-     * el repetido NO debe mutar estado ni reponer feedback.
+     * SB1-03: el segundo finalize es una transición inválida y responde 409;
+     * la sesión sigue accesible por A y el repetido no muta el estado.
      */
     @Test
-    @Disabled("SB1-03 (Alejandro): finalize inválido debe ser 409; mientras tanto IllegalState → 500")
     void repeatedFinalize_shouldNotMutateStateAgain() throws Exception {
         Session session = commandService.create(USER_A, "Para finalizar dos veces", "PITCH");
         session.start();

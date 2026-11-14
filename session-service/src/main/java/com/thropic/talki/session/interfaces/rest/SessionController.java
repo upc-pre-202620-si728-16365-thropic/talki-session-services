@@ -58,6 +58,13 @@ public class SessionController {
         return ResponseEntity.ok(queryService.findByUserId(currentUser(request).userId()));
     }
 
+    /** SB1-03: DRAFT → RECORDING. Una transición inválida responde 409. */
+    @PostMapping("/{id}/start")
+    public ResponseEntity<Session> start(@PathVariable Long id, HttpServletRequest request) {
+        accessService.assertOwner(id, currentUser(request).userId());
+        return ResponseEntity.ok(commandService.start(id));
+    }
+
     @PostMapping("/{id}/finalize")
     public ResponseEntity<Session> finalize(@PathVariable Long id, HttpServletRequest request) {
         accessService.assertOwner(id, currentUser(request).userId());
