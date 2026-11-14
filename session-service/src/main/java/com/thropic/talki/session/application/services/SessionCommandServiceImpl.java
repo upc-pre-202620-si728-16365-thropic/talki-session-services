@@ -42,6 +42,15 @@ public class SessionCommandServiceImpl implements SessionCommandService {
 
     @Override
     @Transactional
+    public Session start(Long sessionId) {
+        Session session = sessionRepository.findById(sessionId)
+                .orElseThrow(() -> new IllegalArgumentException("Session not found: " + sessionId));
+        session.start();
+        return sessionRepository.save(session);
+    }
+
+    @Override
+    @Transactional
     public Session finalize(Long sessionId) {
         Session session = sessionRepository.findById(sessionId)
                 .orElseThrow(() -> new IllegalArgumentException("Session not found: " + sessionId));
